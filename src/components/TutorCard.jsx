@@ -1,15 +1,16 @@
+import { memo } from 'react';
 import RatingStars from './RatingStars';
 import { averageRating } from '../utils/rating';
 import { formatPrice, pluralize, FORMAT_LABELS } from '../utils/format';
 
-export default function TutorCard({ tutor, isFavorite, isSelected, onSelect, onToggleFavorite }) {
+function TutorCard({ tutor, isFavorite, isSelected, onSelect, onToggleFavorite }) {
   const rating = averageRating(tutor.reviews);
   const reviewsCount = tutor.reviews.length;
 
   return (
     <article className={'tutor-card' + (isSelected ? ' tutor-card--selected' : '')}>
       <div className="tutor-card__media">
-        <img className="tutor-card__photo" src={tutor.photo} alt={tutor.name} />
+        <img className="tutor-card__photo" src={tutor.photo} alt={tutor.name} loading="lazy" />
         <button
           type="button"
           className={'tutor-card__fav' + (isFavorite ? ' is-active' : '')}
@@ -64,3 +65,5 @@ export default function TutorCard({ tutor, isFavorite, isSelected, onSelect, onT
     </article>
   );
 }
+
+export default memo(TutorCard);

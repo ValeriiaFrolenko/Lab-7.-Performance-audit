@@ -1,15 +1,15 @@
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import TutorCard from './TutorCard';
 import { useBioClamp } from '../hooks/useBioClamp';
 
-export default function TutorList({
-  tutors,
-  favorites,
-  selectedId,
-  onSelect,
-  onToggleFavorite,
-  style,
-}) {
+function TutorList({
+                     tutors,
+                     favorites,
+                     selectedId,
+                     onSelect,
+                     onToggleFavorite,
+                     style,
+                   }) {
   const containerRef = useRef(null);
   useBioClamp(containerRef, [tutors]);
 
@@ -21,10 +21,12 @@ export default function TutorList({
           tutor={tutor}
           isFavorite={favorites.includes(tutor.id)}
           isSelected={tutor.id === selectedId}
-          onSelect={() => onSelect(tutor.id)}
-          onToggleFavorite={() => onToggleFavorite(tutor.id)}
+          onSelect={onSelect}
+          onToggleFavorite={onToggleFavorite}
         />
       ))}
     </div>
   );
 }
+
+export default memo(TutorList);
