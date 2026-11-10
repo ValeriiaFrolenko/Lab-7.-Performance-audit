@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { tutors } from './data/tutors';
 import { getVisibleTutors } from './utils/catalog';
 import { useReferenceData } from './hooks/useReferenceData';
@@ -28,7 +28,11 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const reference = useReferenceData();
 
-  const visible = getVisibleTutors(tutors, { query, filters, sortBy });
+  const visible = useMemo(
+    () => getVisibleTutors(tutors, { query, filters, sortBy }),
+    [query, filters, sortBy]
+  );
+
   const selected = tutors.find((t) => t.id === selectedId);
 
   const toggleFavorite = (id) => {
