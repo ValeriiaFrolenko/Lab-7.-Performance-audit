@@ -1,30 +1,41 @@
 import { useLayoutEffect } from 'react';
 
-function isInViewport(rect) {
-  return rect.bottom > 0 && rect.top < window.innerHeight;
-}
-
 export function useBioClamp(containerRef, deps) {
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return undefined;
 
-    const update = () => {
-      container.querySelectorAll('.tutor-card__bio').forEach((bio) => {
-        if (!isInViewport(bio.getBoundingClientRect())) return;
-        bio.classList.remove('is-clamped');
-        const fullHeight = bio.offsetHeight;
-        bio.classList.add('is-clamped');
-        bio.closest('.tutor-card').classList.toggle('has-more', fullHeight > bio.offsetHeight + 1);
-      });
+    const update = (bio) => {
+      const card = bio.closest('.tutor-card');
+      if (card) {
+        card.classList.toggle('has-more', bio.scrollHeight > bio.clientHeight + 1);
+      }
     };
 
-    update();
-    window.addEventListener('scroll', update);
-    window.addEventListener('resize', update);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            update(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '200px' }
+    );
+
+    const bios = container.querySelectorAll('.tutor-card__bio');
+    bios.forEach((bio) => observer.observe(bio));
+
+    const onResize = () => {
+      bios.forEach((bio) => observer.observe(bio));
+    };
+
+    window.addEventListener('resize', onResize);
+
     return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      observer.disconnect();
+      window.removeEventListener('resize', onResize);
     };
   }, deps);
 }
